@@ -1,11 +1,12 @@
 module Api
   module V1
     class TasksController < ApplicationController
+      before_action :authorize_access_request!
       before_action :set_task, only: %i[ show update destroy ]
 
       # GET /tasks
       def index
-        @tasks = Task.all
+        @tasks = current_user.tasks.all
 
         render json: @tasks
       end
@@ -17,7 +18,7 @@ module Api
 
       # POST /tasks
       def create
-        @task = Task.new(task_params)
+        @task = current_user.tasks.build(task_params)
 
         if @task.save
           render json: @task, status: :created, location: @task
@@ -43,7 +44,7 @@ module Api
       private
       # Use callbacks to share common setup or constraints between actions.
       def set_task
-        @task = Task.find(params[:id])
+        @task = current_user.tasks.find(params[:id])
       end
 
       # Only allow a list of trusted parameters through.
